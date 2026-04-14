@@ -1,0 +1,59 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to OVH VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ── Copy project files to VPS ──────────────────────────────────────────
+      - name: Copy files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: vps-bc406ee6.vps.ovh.net
+          username: ubuntu
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: 22
+          source: ".,!.git,!.github,!.env,!.env.example"
+          target: /home/ubuntu/app.legalflowone
+          rm: false
+
+      # ── SSH: create .env, build & start containers ─────────────────────────
+      - name: Deploy with Docker Compose
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: vps-bc406ee6.vps.ovh.net
+          username: ubuntu
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: 22
+          script: |
+            set -e
+
+            APP_DIR=/home/ubuntu/app.legalflowone
+
+            cd $APP_DIR
+
+            # Write .env from GitHub secrets
+            cat > .env <<EOF
+            DB_NAME=legalflowone
+            DB_USER=legalflow
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            EOF
+
+            # Pull latest images and rebuild
+            docker compose pull --ignore-pull-failures || true
+            docker compose up --build -d
+
+            # Remove unused images to save disk space
+            docker image prune -f
+
+            echo "Deployment complete!"
