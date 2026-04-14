@@ -11,13 +11,23 @@ Marketing website + REST API backend for **LegalFlow One**, a company that helps
 ```
 app.legalflowone/
 ├── Dockerfile                  # Python backend image (builds from src/)
-├── docker-compose.yml          # Orchestrates nginx, backend, db
+├── docker-compose.yml          # Orchestrates nginx, frontend, backend, db
 ├── .env                        # Local secrets (never commit)
 ├── .env.example                # Template for .env
 ├── nginx/
-│   └── nginx.conf              # Serves static/, proxies /api/* to backend
-├── static/
-│   └── index.html              # Marketing landing page (pure HTML/CSS)
+│   └── nginx.conf              # Proxies /* to frontend, /api/* to backend
+├── frontend/                   # Next.js 15 marketing site
+│   ├── Dockerfile              # Multi-stage Node 20 build (standalone output)
+│   ├── next.config.mjs         # Next.js config (must be .mjs, not .ts)
+│   ├── tailwind.config.ts
+│   ├── postcss.config.js
+│   ├── package.json
+│   ├── public/                 # Must exist for Docker build (keep .gitkeep if empty)
+│   └── src/
+│       ├── app/                # Next.js App Router (layout.tsx, page.tsx, globals.css)
+│       ├── components/         # One file per page section (13 components)
+│       └── lib/
+│           └── data.ts         # All website copy and data arrays — edit here
 ├── src/
 │   ├── app.py                  # Flask API
 │   └── requirements.txt        # Python dependencies
@@ -32,27 +42,28 @@ app.legalflowone/
 
 ## Stack
 
-| Layer    | Technology              |
-|----------|-------------------------|
-| Frontend | HTML/CSS (static)       |
-| Backend  | Python 3.12 + Flask     |
-| Database | MySQL 8.0               |
-| Server   | NGINX (alpine)          |
-| Runtime  | Docker + Docker Compose |
-| CI/CD    | GitHub Actions          |
+| Layer    | Technology                          |
+|----------|-------------------------------------|
+| Frontend | Next.js 15 + TypeScript + Tailwind  |
+| Backend  | Python 3.12 + Flask                 |
+| Database | MySQL 8.0                           |
+| Server   | NGINX (alpine)                      |
+| Runtime  | Docker + Docker Compose             |
+| CI/CD    | GitHub Actions                      |
 
 ---
 
 ## Services (docker-compose)
 
-| Service   | Image           | Port            | Role                              |
-|-----------|-----------------|-----------------|-----------------------------------|
-| `nginx`   | nginx:alpine    | `80` (public)   | Serves static + reverse proxy     |
-| `backend` | Dockerfile      | `5000` (internal) | Flask REST API                  |
-| `db`      | mysql:8.0       | `3306` (internal) | MySQL database                  |
+| Service    | Image / Build       | Port              | Role                              |
+|------------|---------------------|-------------------|-----------------------------------|
+| `nginx`    | nginx:alpine        | `80` (public)     | Reverse proxy                     |
+| `frontend` | frontend/Dockerfile | `3000` (internal) | Next.js marketing site            |
+| `backend`  | Dockerfile          | `5000` (internal) | Flask REST API                    |
+| `db`       | mysql:8.0           | `3306` (internal) | MySQL database                    |
 
 NGINX routes:
-- `/*` → serves `static/index.html`
+- `/*` → proxies to `frontend:3000` (Next.js)
 - `/api/*` → proxies to `backend:5000/api/`
 
 ---
@@ -100,7 +111,9 @@ docker compose up --build
 - Health check: http://localhost/api/health
 
 Stop: `docker compose down`
-Logs: `docker compose logs -f backend`
+Logs: `docker compose logs -f frontend` / `docker compose logs -f backend`
+
+> **Note:** `frontend/public/` must exist for the Next.js standalone Docker build to succeed. If the directory is empty, keep a `.gitkeep` inside it.
 
 ---
 
@@ -131,17 +144,23 @@ Add at: `GitHub repo → Settings → Secrets and variables → Actions`
 
 ---
 
-## Frontend — Marketing Page
+## Frontend — Marketing Site
 
-Single-page marketing site at `static/index.html`. Sections:
-- Sticky nav with CTA
-- Hero with headline and actions
-- Stats bar (2,500+ companies, 98% satisfaction, 15+ jurisdictions, 48h setup)
-- Services grid (6 cards)
-- How It Works (4 steps)
-- Why Us (dark navy section)
-- Testimonials (3 quotes)
-- CTA banner (email link)
+Next.js 15 app at `frontend/`. Page sections (in order):
+
+- Navigation (sticky, transparent → white on scroll, mobile drawer)
+- Hero (headline, two CTAs, animated product dashboard mockup)
+- Problem (4 pain-point cards)
+- Solution (sticky copy + 6 feature blocks)
+- Features (6-card grid with hover effects)
+- How It Works (3-step timeline)
+- Use Cases (5 audience cards)
+- Benefits (split layout)
+- Differentiation (dark comparison table — no competitor names)
+- Trust (4 trust-signal cards)
+- CTA banner
 - Footer
 
-Color palette: Navy `#0d1b2a`, Blue `#1a56db`, Gold `#f5a623`. No external dependencies.
+**Edit all copy** in `frontend/src/lib/data.ts` — titles, descriptions, and data arrays for every section are centralised there.
+
+Color palette: White/slate base, Indigo `#4f46e5` accent. Uses `lucide-react` for icons and `framer-motion` for scroll animations.
