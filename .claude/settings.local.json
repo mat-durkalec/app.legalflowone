@@ -2,7 +2,20 @@
   "permissions": {
     "allow": [
       "Bash(docker compose:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(curl -i -L http://localhost/app/)",
+      "Bash(curl -i http://localhost/app/login)",
+      "Bash(curl -i http://localhost:3001/login)",
+      "Bash(curl -i http://localhost/app)",
+      "Bash(docker build:*)",
+      "Bash(curl -s http://localhost/app/login)",
+      "Bash(curl -i http://localhost/app/dashboard)",
+      "Bash(curl -i http://localhost/app/)",
+      "Bash(curl -s http://localhost)",
+      "Bash(curl -i http://localhost/app/api/auth/providers)",
+      "Bash(curl -s http://localhost/app/api/auth/providers)",
+      "Bash(curl -i -X POST http://localhost/app/api/auth/callback/credentials -d \"email=test@example.com&password=demo\")",
+      "Bash(curl -i -X POST http://localhost/api/auth/callback/credentials -d \"email=test@example.com&password=demo\" -H \"Content-Type: application/x-www-form-urlencoded\")"
     ]
   }
 }
