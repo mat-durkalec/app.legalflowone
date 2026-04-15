@@ -7,6 +7,7 @@ import { HowItWorks }        from '@/components/HowItWorks'
 import { UseCases }          from '@/components/UseCases'
 import { Benefits }          from '@/components/Benefits'
 import { Differentiation }   from '@/components/Differentiation'
+import { ProductShowcase }   from '@/components/ProductShowcase'
 import { TrustSection }      from '@/components/TrustSection'
 import { CtaSection }        from '@/components/CtaSection'
 import { Footer }            from '@/components/Footer'
@@ -24,6 +25,7 @@ export default function HomePage() {
         <UseCases />
         <Benefits />
         <Differentiation />
+        <ProductShowcase />
         <TrustSection />
         <CtaSection />
       </main>
