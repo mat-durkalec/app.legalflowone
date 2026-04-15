@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, ArrowUpRight } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { siteConfig } from '@/lib/data'
 
@@ -66,9 +66,16 @@ export function Navigation() {
           </a>
           <a
             href="#demo"
-            className="text-sm font-semibold bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all shadow-sm hover:shadow-indigo-200 hover:shadow-md"
+            className="text-sm font-semibold border border-indigo-200 text-indigo-700 px-4 py-2 rounded-lg hover:border-indigo-400 hover:bg-indigo-50 transition-all"
           >
             Book a demo
+          </a>
+          <a
+            href="/app"
+            className="text-sm font-semibold bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all shadow-sm hover:shadow-indigo-200 hover:shadow-md inline-flex items-center gap-1.5"
+          >
+            Open App
+            <ArrowUpRight size={14} />
           </a>
         </div>
 
@@ -113,10 +120,18 @@ export function Navigation() {
                 </a>
                 <a
                   href="#demo"
-                  className="text-sm font-semibold bg-indigo-600 text-white rounded-lg py-2.5 text-center hover:bg-indigo-700 transition-colors"
+                  className="text-sm font-semibold border border-indigo-200 text-indigo-700 rounded-lg py-2.5 text-center hover:bg-indigo-50 transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
                   Book a demo
+                </a>
+                <a
+                  href="/app"
+                  className="text-sm font-semibold bg-indigo-600 text-white rounded-lg py-2.5 text-center hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1.5"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Open App
+                  <ArrowUpRight size={14} />
                 </a>
               </div>
             </div>
